@@ -31,9 +31,9 @@ export default function Contato() {
       <div>
         {listaContatos.map((contato) => (
           <div>
-            <h1> Nome: {contato.nome}</h1>
-            <span> Email: {contato.email}</span>
-            <span> Telefone: {contato.telefone}</span>
+            <p> Nome: {contato.nome}</p>
+            <p> Email: {contato.email}</p>
+            <p> Telefone: {contato.telefone}</p>
           </div>
         ))}
       </div>
