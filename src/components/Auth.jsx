@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { auth } from "../config/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Auth = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +20,7 @@ export const Auth = () => {
       // Só prossegue se email e senha não forem vazios
       try {
         console.log("email= " + email);
-        await createUserWithEmailAndPassword(auth, email, senha);
+        await signInWithEmailAndPassword(auth, email, senha);
         navigate("/Contato");
       } catch (err) {
         console.error(err);
@@ -66,13 +66,11 @@ export const Auth = () => {
           >
             Login
           </button>
-
-          <button
-            className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
-            onClick={login}
-          >
-            Cadastrar
-          </button>
+          <Link to={"/Cadastro"}>
+            <button className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none">
+              Cadastre-se
+            </button>
+          </Link>
         </div>
       </form>
     </div>

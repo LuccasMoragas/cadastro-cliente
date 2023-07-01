@@ -72,7 +72,12 @@ export default function Contato() {
           type="number"
           onChange={(e) => setNewContatoTelefone(Number(e.target.value))}
         />
-        <button onClick={salvarContato}> Salvar Contato </button>
+        <button
+          className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
+          onClick={salvarContato}
+        >
+          Salvar Contato
+        </button>
       </div>
       <div>
         {listaContatos.map((contato) => (
@@ -80,7 +85,10 @@ export default function Contato() {
             <p> Nome: {contato.nome}</p>
             <p> Email: {contato.email}</p>
             <p> Telefone: {contato.telefone}</p>
-            <button onClick={() => deletarContato(contato.id)}>
+            <button
+              className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
+              onClick={() => deletarContato(contato.id)}
+            >
               Deletar Contato
             </button>
           </div>
