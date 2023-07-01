@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { db } from "../config/firebase";
+import { auth, db } from "../config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   getDocs,
   collection,
@@ -9,6 +10,7 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
+import ContatoItem from "../components/ContatoItem";
 
 export default function Contato() {
   const [listaContatos, setListaContatos] = useState([]);
@@ -19,7 +21,12 @@ export default function Contato() {
   const [newContatoEmail, setNewContatoEmail] = useState("");
   const [newContatoTelefone, setNewContatoTelefone] = useState(0);
 
-  const [nomeAtualizado, setNomeAtualizado] = useState("");
+  //Verificar se o usuario está logado
+  const [user, setUser] = useState({});
+
+  onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
 
   const getListaContatos = async () => {
     try {
@@ -58,9 +65,11 @@ export default function Contato() {
     getListaContatos();
   };
 
-  const atualizarContatoNome = async (id) => {
+  const atualizarContatoNome = async (id, nome) => {
+    if (!nome) return;
+
     const contatoDoc = doc(db, "contatos", id);
-    await updateDoc(contatoDoc, { nome: nomeAtualizado });
+    await updateDoc(contatoDoc, { nome });
     getListaContatos();
   };
 
@@ -71,6 +80,8 @@ export default function Contato() {
   return (
     <div className="Contato">
       <Header />
+      <h2 className="">Usuário:</h2>
+      {user.email}
       <div className="flex flex-col items-center justify-center">
         <form
           onSubmit={prevent}
@@ -107,30 +118,16 @@ export default function Contato() {
             </button>
           </div>
         </form>
-        <div>
+        <div className=" divide-y divide-gray-300">
           {listaContatos.map((contato) => (
-            <div key={contato.id}>
-              <p> Nome: {contato.nome}</p>
-              <p> Email: {contato.email}</p>
-              <p> Telefone: {contato.telefone}</p>
-              <button
-                className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
-                onClick={() => deletarContato(contato.id)}
-              >
-                Deletar Contato
-              </button>
-
-              <input
-                placeholder="Novo Nome"
-                onChange={(e) => setNomeAtualizado(e.target.value)}
-              />
-              <button
-                className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
-                onClick={() => atualizarContatoNome(contato.id)}
-              >
-                Atualizar
-              </button>
-            </div>
+            <ContatoItem
+              key={contato.id}
+              contato={contato}
+              onDeletaContato={(contatoID) => deletarContato(contatoID)}
+              onAtualizaContatoNome={(novoNome) =>
+                atualizarContatoNome(contato.id, novoNome)
+              }
+            />
           ))}
         </div>
       </div>
