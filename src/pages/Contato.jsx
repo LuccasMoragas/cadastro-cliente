@@ -30,7 +30,7 @@ export default function Contato() {
 
       <div>
         {listaContatos.map((contato) => (
-          <div>
+          <div key={contato.id}>
             <p> Nome: {contato.nome}</p>
             <p> Email: {contato.email}</p>
             <p> Telefone: {contato.telefone}</p>
