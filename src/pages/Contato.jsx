@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { db } from "../config/firebase";
-import { getDocs, collection, addDoc } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 export default function Contato() {
   const [listaContatos, setListaContatos] = useState([]);
@@ -43,6 +49,12 @@ export default function Contato() {
     }
   };
 
+  const deletarContato = async (id) => {
+    const contatoDoc = doc(db, "contatos", id);
+    await deleteDoc(contatoDoc);
+    getListaContatos();
+  };
+
   return (
     <div className="Contato">
       <Header />
@@ -68,6 +80,9 @@ export default function Contato() {
             <p> Nome: {contato.nome}</p>
             <p> Email: {contato.email}</p>
             <p> Telefone: {contato.telefone}</p>
+            <button onClick={() => deletarContato(contato.id)}>
+              Deletar Contato
+            </button>
           </div>
         ))}
       </div>
