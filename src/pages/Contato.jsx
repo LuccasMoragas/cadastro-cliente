@@ -6,6 +6,7 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
 } from "firebase/firestore";
 
@@ -17,6 +18,8 @@ export default function Contato() {
   const [newContatoNome, setNewContatoNome] = useState("");
   const [newContatoEmail, setNewContatoEmail] = useState("");
   const [newContatoTelefone, setNewContatoTelefone] = useState(0);
+
+  const [nomeAtualizado, setNomeAtualizado] = useState("");
 
   const getListaContatos = async () => {
     try {
@@ -55,6 +58,16 @@ export default function Contato() {
     getListaContatos();
   };
 
+  const atualizarContatoNome = async (id) => {
+    const contatoDoc = doc(db, "contatos", id);
+    await updateDoc(contatoDoc, { nome: nomeAtualizado });
+    getListaContatos();
+  };
+
+  function prevent(event) {
+    event.preventDefault();
+  }
+
   return (
     <div className="Contato">
       <Header />
@@ -79,6 +92,7 @@ export default function Contato() {
           Salvar Contato
         </button>
       </div>
+
       <div>
         {listaContatos.map((contato) => (
           <div key={contato.id}>
@@ -90,6 +104,17 @@ export default function Contato() {
               onClick={() => deletarContato(contato.id)}
             >
               Deletar Contato
+            </button>
+
+            <input
+              placeholder="Novo Nome"
+              onChange={(e) => setNomeAtualizado(e.target.value)}
+            />
+            <button
+              className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
+              onClick={() => atualizarContatoNome(contato.id)}
+            >
+              Atualizar
             </button>
           </div>
         ))}
