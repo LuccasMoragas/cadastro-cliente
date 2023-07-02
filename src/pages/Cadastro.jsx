@@ -6,20 +6,30 @@ import { useNavigate } from "react-router-dom";
 export default function Cadastro() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [emailError, setEmailError] = useState(false); // Novo estado para o erro de email
-  const [senhaError, setSenhaError] = useState(false); // Novo estado para o erro de senha
+  const [emailError, setEmailError] = useState("");
+  const [senhaError, setSenhaError] = useState("");
   const navigate = useNavigate();
 
-  console.log(auth?.currentUser?.email);
-
   const login = async () => {
-    setEmailError(!email); // Se email for vazio, emailError será true
-    setSenhaError(!senha); // Se senha for vazio, senhaError será true
+    setEmailError("");
+    setSenhaError("");
 
-    if (email && senha) {
-      // Só prossegue se email e senha não forem vazios
+    let hasError = false;
+
+    if (!email || !validateEmail(email)) {
+      setEmailError("Por favor, insira um email válido.");
+      hasError = true;
+    }
+
+    if (!senha || senha.length < 6) {
+      setSenhaError(
+        "Por favor, insira uma senha válida com no mínimo 6 caracteres."
+      );
+      hasError = true;
+    }
+
+    if (!hasError) {
       try {
-        console.log("email= " + email);
         await createUserWithEmailAndPassword(auth, email, senha);
         navigate("/Contato");
       } catch (err) {
@@ -30,6 +40,12 @@ export default function Cadastro() {
 
   function prevent(event) {
     event.preventDefault();
+  }
+
+  function validateEmail(value) {
+    // Regex para validar o formato do email
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    return emailRegex.test(value);
   }
 
   return (
@@ -44,9 +60,7 @@ export default function Cadastro() {
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
-          {emailError && (
-            <p style={{ color: "red" }}>Por favor, insira um email.</p>
-          )}
+          {emailError && <p style={{ color: "red" }}>{emailError}</p>}
         </div>
         <div className="mb-6">
           <input
@@ -55,9 +69,7 @@ export default function Cadastro() {
             type="password"
             onChange={(e) => setSenha(e.target.value)}
           />
-          {senhaError && (
-            <p style={{ color: "red" }}>Por favor, insira uma senha.</p>
-          )}
+          {senhaError && <p style={{ color: "red" }}>{senhaError}</p>}
         </div>
         <div className="flex items-center justify-evenly">
           <button
