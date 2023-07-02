@@ -24,10 +24,6 @@ export default function Contato() {
   //Verificar se o usuario está logado
   const [user, setUser] = useState({});
 
-  onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-  });
-
   const getListaContatos = async () => {
     try {
       const data = await getDocs(colecaoContatosRef);
@@ -43,6 +39,10 @@ export default function Contato() {
 
   useEffect(() => {
     getListaContatos();
+
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
   }, []);
 
   const salvarContato = async () => {
@@ -52,7 +52,6 @@ export default function Contato() {
         email: newContatoEmail,
         telefone: newContatoTelefone,
       });
-
       getListaContatos();
     } catch (err) {
       console.error(err);
@@ -65,11 +64,12 @@ export default function Contato() {
     getListaContatos();
   };
 
-  const atualizarContatoNome = async (id, nome) => {
-    if (!nome) return;
-
+  const atualizarContato = async (id, novosDados) => {
     const contatoDoc = doc(db, "contatos", id);
-    await updateDoc(contatoDoc, { nome });
+
+    if (!contatoDoc) return;
+
+    await updateDoc(contatoDoc, novosDados);
     getListaContatos();
   };
 
@@ -81,7 +81,7 @@ export default function Contato() {
     <div className="Contato">
       <Header />
       <h2 className="">Usuário:</h2>
-      {user.email}
+      {user?.email}
       <div className="flex flex-col items-center justify-center">
         <form
           onSubmit={prevent}
@@ -118,14 +118,14 @@ export default function Contato() {
             </button>
           </div>
         </form>
-        <div className=" divide-y divide-gray-300">
+        <div className="divide-y divide-gray-300">
           {listaContatos.map((contato) => (
             <ContatoItem
               key={contato.id}
               contato={contato}
               onDeletaContato={(contatoID) => deletarContato(contatoID)}
-              onAtualizaContatoNome={(novoNome) =>
-                atualizarContatoNome(contato.id, novoNome)
+              onAtualizaContato={(novosDados) =>
+                atualizarContato(contato.id, novosDados)
               }
             />
           ))}

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth } from "../config/firebase";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 export const Auth = () => {
@@ -9,6 +9,7 @@ export const Auth = () => {
   const [emailError, setEmailError] = useState(false); // Novo estado para o erro de email
   const [senhaError, setSenhaError] = useState(false); // Novo estado para o erro de senha
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   console.log(auth?.currentUser?.email);
 
@@ -31,6 +32,19 @@ export const Auth = () => {
   function prevent(event) {
     event.preventDefault();
   }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    // Redirect to the contact page if the user is already logged in
+    if (user) {
+      navigate("/Contato");
+    }
+
+    return () => unsubscribe(); // Clean up the subscription when the component unmounts
+  }, [user, navigate]);
 
   return (
     <div className="flex h-screen items-start justify-center">
