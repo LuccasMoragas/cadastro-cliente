@@ -1,30 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { auth } from "../config/firebase";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 export const Auth = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [emailError, setEmailError] = useState(false); // Novo estado para o erro de email
-  const [senhaError, setSenhaError] = useState(false); // Novo estado para o erro de senha
+  const [emailError, setEmailError] = useState("");
+  const [senhaError, setSenhaError] = useState("");
+  const [loginError, setLoginError] = useState(""); // Novo estado para o erro de login
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  console.log(auth?.currentUser?.email);
 
   const login = async () => {
-    setEmailError(!email); // Se email for vazio, emailError será true
-    setSenhaError(!senha); // Se senha for vazio, senhaError será true
+    setEmailError("");
+    setSenhaError("");
+    setLoginError("");
 
-    if (email && senha) {
-      // Só prossegue se email e senha não forem vazios
+    let hasError = false;
+
+    if (!email || !validateEmail(email)) {
+      setEmailError("Por favor, insira um email válido.");
+      hasError = true;
+    }
+
+    if (!senha || senha.length < 6) {
+      setSenhaError(
+        "Por favor, insira uma senha válida com no mínimo 6 caracteres."
+      );
+      hasError = true;
+    }
+
+    if (!hasError) {
       try {
-        console.log("email= " + email);
         await signInWithEmailAndPassword(auth, email, senha);
         navigate("/Contato");
       } catch (err) {
         console.error(err);
+        setLoginError("Email ou senha incorretos."); // Define a mensagem de erro de login
       }
     }
   };
@@ -33,18 +45,11 @@ export const Auth = () => {
     event.preventDefault();
   }
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-
-    // Redirect to the contact page if the user is already logged in
-    if (user) {
-      navigate("/Contato");
-    }
-
-    return () => unsubscribe(); // Clean up the subscription when the component unmounts
-  }, [user, navigate]);
+  function validateEmail(value) {
+    // Regex para validar o formato do email
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    return emailRegex.test(value);
+  }
 
   return (
     <div className="flex h-screen items-start justify-center">
@@ -58,9 +63,7 @@ export const Auth = () => {
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
-          {emailError && (
-            <p style={{ color: "red" }}>Por favor, insira um email.</p>
-          )}
+          {emailError && <p style={{ color: "red" }}>{emailError}</p>}
         </div>
         <div className="mb-6">
           <input
@@ -69,10 +72,10 @@ export const Auth = () => {
             type="password"
             onChange={(e) => setSenha(e.target.value)}
           />
-          {senhaError && (
-            <p style={{ color: "red" }}>Por favor, insira uma senha.</p>
-          )}
+          {senhaError && <p style={{ color: "red" }}>{senhaError}</p>}
         </div>
+        {loginError && <p style={{ color: "red" }}>{loginError}</p>}{" "}
+        {/* Exibe a mensagem de erro de login */}
         <div className="flex items-center justify-evenly">
           <button
             className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
