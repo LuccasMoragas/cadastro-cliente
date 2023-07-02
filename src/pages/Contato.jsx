@@ -51,6 +51,7 @@ export default function Contato() {
         nome: newContatoNome,
         email: newContatoEmail,
         telefone: newContatoTelefone,
+        userId: auth.currentUser?.uid,
       });
       getListaContatos();
     } catch (err) {

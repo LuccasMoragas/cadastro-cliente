@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth } from "../config/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 export const Auth = () => {
@@ -10,6 +10,9 @@ export const Auth = () => {
   const [senhaError, setSenhaError] = useState("");
   const [loginError, setLoginError] = useState(""); // Novo estado para o erro de login
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  console.log(auth?.currentUser?.email);
 
   const login = async () => {
     setEmailError("");
@@ -32,6 +35,7 @@ export const Auth = () => {
 
     if (!hasError) {
       try {
+        console.log("email= " + email);
         await signInWithEmailAndPassword(auth, email, senha);
         navigate("/Contato");
       } catch (err) {
@@ -50,6 +54,19 @@ export const Auth = () => {
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     return emailRegex.test(value);
   }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    // Redireciona para a página de contato se o usuário já estiver logado
+    if (user) {
+      navigate("/Contato");
+    }
+
+    return () => unsubscribe(); // Limpa a assinatura quando o componente desmontar
+  }, [user, navigate]);
 
   return (
     <div className="flex h-screen items-start justify-center">
