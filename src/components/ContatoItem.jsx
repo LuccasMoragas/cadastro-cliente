@@ -10,7 +10,7 @@ export default function ContatoItem({
   const [novosDados, setNovosDados] = useState({ ...contato });
 
   return (
-    <div className="py-4">
+    <div className="rounded-md border-[1px] border-gray-300 p-4 shadow-md">
       <div>
         <p>Nome: {contato.nome}</p>
         <p>Email: {contato.email}</p>

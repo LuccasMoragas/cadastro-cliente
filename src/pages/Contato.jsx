@@ -19,7 +19,7 @@ export default function Contato() {
   //Estado dos Contatos
   const [newContatoNome, setNewContatoNome] = useState("");
   const [newContatoEmail, setNewContatoEmail] = useState("");
-  const [newContatoTelefone, setNewContatoTelefone] = useState(0);
+  const [newContatoTelefone, setNewContatoTelefone] = useState();
 
   //Verificar se o usuario está logado
   const [user, setUser] = useState({});
@@ -119,7 +119,7 @@ export default function Contato() {
             </button>
           </div>
         </form>
-        <div className="divide-y divide-gray-300">
+        <div className=" grid grid-cols-4 gap-6 ">
           {listaContatos.map((contato) => (
             <ContatoItem
               key={contato.id}
