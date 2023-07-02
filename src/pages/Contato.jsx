@@ -27,10 +27,10 @@ export default function Contato() {
   const getListaContatos = async () => {
     try {
       const data = await getDocs(colecaoContatosRef);
-      const filteredData = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+
+      const filteredData = data.docs
+        .filter((doc) => doc.data().userId === auth?.currentUser?.uid)
+        .map((doc) => ({ ...doc.data(), id: doc.id }));
       setListaContatos(filteredData);
     } catch (err) {
       console.error(err);
@@ -51,7 +51,7 @@ export default function Contato() {
         nome: newContatoNome,
         email: newContatoEmail,
         telefone: newContatoTelefone,
-        userId: auth.currentUser?.uid,
+        userId: auth?.currentUser?.uid,
       });
       getListaContatos();
     } catch (err) {
