@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { auth } from "../config/firebase";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 export const Auth = () => {
@@ -42,6 +46,25 @@ export const Auth = () => {
         console.error(err);
         setLoginError("Email ou senha incorretos."); // Define a mensagem de erro de login
       }
+    }
+  };
+
+  const resetPassword = async () => {
+    if (!email || !validateEmail(email)) {
+      setEmailError("Por favor, insira um email válido.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert(
+        "Um email para redefinição de senha foi enviado para o seu endereço de email."
+      );
+    } catch (err) {
+      console.error(err);
+      setLoginError(
+        "Ocorreu um erro ao enviar o email de redefinição de senha."
+      );
     }
   };
 
@@ -93,15 +116,21 @@ export const Auth = () => {
         </div>
         {loginError && <p style={{ color: "red" }}>{loginError}</p>}{" "}
         {/* Exibe a mensagem de erro de login */}
-        <div className="flex items-center justify-evenly">
+        <div className="flex flex-col items-center justify-center gap-2">
           <button
-            className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
+            className="focus:shadow-outline w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
             onClick={login}
           >
             Login
           </button>
+          <button
+            className="focus:shadow-outline w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
+            onClick={resetPassword}
+          >
+            Esqueci minha senha
+          </button>
           <Link to={"/Cadastro"}>
-            <button className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none">
+            <button className="focus:shadow-outline w-full rounded px-4 py-2 font-bold text-blue-500 hover:text-blue-700 focus:outline-none">
               Cadastre-se
             </button>
           </Link>
