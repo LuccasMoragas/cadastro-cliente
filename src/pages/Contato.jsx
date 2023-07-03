@@ -46,6 +46,14 @@ export default function Contato() {
   }, []);
 
   const salvarContato = async () => {
+    if (newContatoNome.length === 0 && newContatoEmail.length === 0)
+      return alert("Insira um Nome ou Email");
+    if (
+      newContatoNome.length > 0 &&
+      newContatoEmail.length === 0 &&
+      newContatoTelefone === 0
+    )
+      return alert("Preencha um Email ou Telefone");
     try {
       await addDoc(colecaoContatosRef, {
         nome: newContatoNome,
@@ -68,6 +76,12 @@ export default function Contato() {
   const atualizarContato = async (id, novosDados) => {
     const contatoDoc = doc(db, "contatos", id);
 
+    if (!novosDados.nome && !novosDados.email)
+      return alert("Insira um Nome ou Email");
+
+    if (novosDados.nome && !novosDados.email && !novosDados.telefone)
+      return alert("Insira um Email ou Telefone");
+
     if (!contatoDoc) return;
 
     await updateDoc(contatoDoc, novosDados);
@@ -76,6 +90,7 @@ export default function Contato() {
 
   function prevent(event) {
     event.preventDefault();
+    salvarContato();
   }
 
   return (
@@ -97,6 +112,7 @@ export default function Contato() {
           </div>
           <div className="mb-6">
             <input
+              type="email"
               className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
               placeholder="Email"
               onChange={(e) => setNewContatoEmail(e.target.value)}
@@ -112,8 +128,8 @@ export default function Contato() {
           </div>
           <div className="flex items-center justify-evenly">
             <button
+              type="submit"
               className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
-              onClick={salvarContato}
             >
               Salvar Contato
             </button>

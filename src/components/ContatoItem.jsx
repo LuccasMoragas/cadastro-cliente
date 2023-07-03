@@ -9,6 +9,12 @@ export default function ContatoItem({
 
   const [novosDados, setNovosDados] = useState({ ...contato });
 
+  function handleSubmit(e) {
+    e.preventDefault();
+    onAtualizaContato(novosDados);
+    setExibeModal(false);
+  }
+
   return (
     <div className="rounded-md border-[1px] border-gray-300 p-4 shadow-md">
       <div>
@@ -41,7 +47,7 @@ export default function ContatoItem({
               className="relative z-10 w-full overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl sm:max-w-lg sm:rounded-b-2xl sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="" className="mb-1.5 block font-medium">
                     Novo Nome
@@ -63,6 +69,7 @@ export default function ContatoItem({
                     Novo E-mail
                   </label>
                   <input
+                    type="email"
                     className="focus:shadow-outline block w-full rounded border-2 border-gray-400 px-3 py-1.5 focus:outline-none"
                     value={novosDados.email}
                     onChange={(e) =>
@@ -79,6 +86,7 @@ export default function ContatoItem({
                     Novo Telefone
                   </label>
                   <input
+                    type="number"
                     className="focus:shadow-outline block w-full rounded border-2 border-gray-400 px-3 py-1.5 focus:outline-none"
                     value={novosDados.telefone}
                     onChange={(e) =>
@@ -93,15 +101,12 @@ export default function ContatoItem({
                 <div>
                   <button
                     className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
-                    onClick={() => {
-                      onAtualizaContato(novosDados);
-                      setExibeModal(false);
-                    }}
+                    type="submit"
                   >
                     Atualizar
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
