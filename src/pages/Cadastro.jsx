@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { auth } from "../config/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  AuthErrorCodes,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function Cadastro() {
@@ -30,10 +34,14 @@ export default function Cadastro() {
 
     if (!hasError) {
       try {
-        await createUserWithEmailAndPassword(auth, email, senha);
+        const authInstance = getAuth(); // Obter a instância de autenticação
+        await createUserWithEmailAndPassword(authInstance, email, senha);
         navigate("/Contato");
       } catch (err) {
         console.error(err);
+        if (err.code === AuthErrorCodes.EMAIL_EXISTS) {
+          setEmailError("Email já cadastrado.");
+        }
       }
     }
   };
