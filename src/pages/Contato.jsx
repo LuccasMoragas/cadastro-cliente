@@ -14,14 +14,15 @@ import ContatoItem from "../components/ContatoItem";
 
 export default function Contato() {
   const [listaContatos, setListaContatos] = useState([]);
+  const [filtro, setFiltro] = useState("");
   const colecaoContatosRef = collection(db, "contatos");
 
-  //Estado dos Contatos
+  // Estado dos Contatos
   const [newContatoNome, setNewContatoNome] = useState("");
   const [newContatoEmail, setNewContatoEmail] = useState("");
-  const [newContatoTelefone, setNewContatoTelefone] = useState();
+  const [newContatoTelefone, setNewContatoTelefone] = useState("");
 
-  //Verificar se o usuario está logado
+  // Verificar se o usuário está logado
   const [user, setUser] = useState({});
 
   const getListaContatos = async () => {
@@ -31,7 +32,21 @@ export default function Contato() {
       const filteredData = data.docs
         .filter((doc) => doc.data().userId === auth?.currentUser?.uid)
         .map((doc) => ({ ...doc.data(), id: doc.id }));
-      setListaContatos(filteredData);
+
+      if (filtro) {
+        const filteredContatos = filteredData.filter((contato) => {
+          const { nome, email, telefone } = contato;
+          const telefoneString = telefone ? telefone.toString() : ""; // Trata o caso em que o telefone é null
+          return (
+            nome.toLowerCase().includes(filtro.toLowerCase()) ||
+            email.toLowerCase().includes(filtro.toLowerCase()) ||
+            telefoneString.includes(filtro)
+          );
+        });
+        setListaContatos(filteredContatos);
+      } else {
+        setListaContatos(filteredData);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -45,20 +60,44 @@ export default function Contato() {
     });
   }, []);
 
+  useEffect(() => {
+    getListaContatos();
+  }, [filtro]);
+
   const salvarContato = async () => {
-    if (newContatoNome.length === 0 && newContatoEmail.length === 0)
-      return alert("Insira um Nome ou Email");
+    if (
+      newContatoNome.length === 0 &&
+      newContatoEmail.length === 0 &&
+      newContatoTelefone === ""
+    ) {
+      return alert("Preencha o nome, email ou telefone do contato");
+    }
     if (
       newContatoNome.length > 0 &&
       newContatoEmail.length === 0 &&
-      newContatoTelefone === 0
-    )
-      return alert("Preencha um Email ou Telefone");
+      newContatoTelefone === ""
+    ) {
+      return alert("Preencha o email ou telefone do contato");
+    }
+    if (
+      newContatoNome.length === 0 &&
+      newContatoEmail.length > 0 &&
+      newContatoTelefone === ""
+    ) {
+      return alert("Preencha o nome ou telefone do contato");
+    }
+    if (
+      newContatoNome.length === 0 &&
+      newContatoEmail.length === 0 &&
+      newContatoTelefone !== ""
+    ) {
+      return alert("Preencha o nome ou email do contato");
+    }
     try {
       await addDoc(colecaoContatosRef, {
         nome: newContatoNome,
         email: newContatoEmail,
-        telefone: newContatoTelefone,
+        telefone: newContatoTelefone || null, // Define como null quando nenhum telefone é inserido
         userId: auth?.currentUser?.uid,
       });
       getListaContatos();
@@ -135,7 +174,15 @@ export default function Contato() {
             </button>
           </div>
         </form>
-        <div className=" grid grid-cols-4 gap-6 ">
+        <div className="mb-4">
+          <input
+            className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
+            placeholder="Pesquisar contato"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+        </div>
+        <div className="grid grid-cols-4 gap-6">
           {listaContatos.map((contato) => (
             <ContatoItem
               key={contato.id}
