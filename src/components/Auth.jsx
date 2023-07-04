@@ -31,9 +31,7 @@ export const Auth = () => {
     }
 
     if (!senha || senha.length < 6) {
-      setSenhaError(
-        "Por favor, insira uma senha válida com no mínimo 6 caracteres."
-      );
+      setSenhaError("Por favor, insira uma senha válida.");
       hasError = true;
     }
 
