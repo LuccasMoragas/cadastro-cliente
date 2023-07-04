@@ -115,8 +115,14 @@ export default function Contato() {
   const atualizarContato = async (id, novosDados) => {
     const contatoDoc = doc(db, "contatos", id);
 
+    if (!novosDados.nome && !novosDados.email && !novosDados.telefone)
+      return alert("Insira um Nome, Email ou Telefone");
+
     if (!novosDados.nome && !novosDados.email)
       return alert("Insira um Nome ou Email");
+
+    if (!novosDados.nome && novosDados.email && !novosDados.telefone)
+      return alert("Insira um Nome ou Telefone");
 
     if (novosDados.nome && !novosDados.email && !novosDados.telefone)
       return alert("Insira um Email ou Telefone");
